@@ -27,6 +27,7 @@ namespace archive_creator {
             struct archive_contents {
                 std::string url;
                 std::string description;
+                std::string date;
                 archive_contents *next = nullptr;
             };
             
@@ -41,7 +42,7 @@ namespace archive_creator {
                 std::string url;
                 std::string description;
                 std::string date;
-                int date;
+                int date_num;
                 date_list *pre = nullptr;
                 date_list *next = nullptr;
             };
@@ -52,9 +53,15 @@ namespace archive_creator {
             void get_files(std::string, std::vector<std::string> &);
             
             
-            void store_contents_to_tree(creator::archive_tree *, creator::date_list *, std::vector<std::string> &, std::string);
+            void store_file_data(creator::archive_tree *, creator::date_list *, std::vector<std::string> &, std::string);
             void get_data_of_file(std::string , std::string &);
             void store_data_to_tree(creator::archive_tree *, creator::date_list *,std::string , std::string &);
+            
+            //content  url date description
+            void store_content(creator::archive_contents *, std::string, std::string, std::string);
+            //list date(string) date(int) url description
+            void store_date(creator::date_list *, std::string, std::string, int, std::string);
+            
             void write_archive(creator::archive_tree *);
             
             void sort_data();
@@ -62,7 +69,10 @@ namespace archive_creator {
             void create_hubs();
             void crate_contents();
             void print_tree(creator::config_tree *);
+            void print_contents(creator::archive_contents *);
             void print_config_tree(creator::config_tree *);
+            
+            
             void free(config_tree *);
         };
 }

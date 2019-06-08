@@ -50,8 +50,6 @@ void creator::read_config(config_tree* tree)
         for (int k = 0; k < size + 1; k++) {
             if (str[k] == ' ')
                 str.erase(str.begin() + k--);
-            //if (str[k] == '\0')
-            //    str.erase(str.begin() + k--);
         }
         if (str[0] == '#') {
             first_count++;
@@ -60,7 +58,6 @@ void creator::read_config(config_tree* tree)
             //get title
             get_word =  str.substr(first_count ,word_count - first_count);
             if (first) {
-                //get_word.push_back('\0');
                 tree->name = get_word;
                 now_place = tree;
                 std::cout << "save title : " << tree->name << std::endl;
@@ -68,7 +65,6 @@ void creator::read_config(config_tree* tree)
             }
             else {
                 config_tree *p = new creator::config_tree;
-                //get_word.push_back('\0');
                 p->name = get_word;
                 now_tree->next = p;
                 now_tree = now_tree->next;
@@ -90,7 +86,6 @@ void creator::read_config(config_tree* tree)
                 first_count = word_count;
                 if (first) {
                     config_tree *p = new creator::config_tree;
-                    //get_word.push_back('\0');
                     p->name = get_word;
                     now_place->deeper = p;
                     now_place = now_place->deeper;
@@ -100,7 +95,6 @@ void creator::read_config(config_tree* tree)
                     first = false;
                 } else {
                     config_tree *p = new creator::config_tree;
-                    //get_word.push_back('\0');
                     p->name = get_word;
                     now_place->next = p;
                     now_place = now_place->next;
@@ -163,7 +157,7 @@ void creator::read_files(creator::archive_tree *tree, creator::date_list *date)
     for(int i = 0; i < file_names.size(); i += 1)
         std::cout << file_names[i] << std::endl;
     //store contents data to tree
-    store_contents_to_tree(tree, date, file_names, contents_path);
+    store_file_data(tree, date, file_names, contents_path);
 }
 
 //get contents file name
@@ -198,7 +192,7 @@ void creator::get_files(std::string path, std::vector<std::string> &file_names)
 }
 
 //store data of contents
-void creator::store_contents_to_tree(creator::archive_tree *tree, creator::date_list *date, std::vector<std::string> &files, std::string path)
+void creator::store_file_data(creator::archive_tree *tree, creator::date_list *date, std::vector<std::string> &files, std::string path)
 {
     std::cout << "store file" << std::endl;
     for (int i = 0; i < files.size(); i += 1) {
@@ -228,8 +222,6 @@ void creator::get_data_of_file(std::string file, std::string &data)
         for (int k = 0; k < data.size() + 1; k++) {
             if (data[k] == ' ')
                 data.erase(data.begin() + k--);
-            //if (data[k] == '\0')
-            //    data.erase(data.begin() + k--);
         }
         while ((data[j] == '<') || (data[j] == '!') || (data[j] == '-')) {
             j++;
@@ -250,11 +242,11 @@ void creator::store_data_to_tree(creator::archive_tree *tree, creator::date_list
     std::cout << "in store data to tree" << std::endl;
     std::cout << file << std::endl;
     archive_tree *now_tree;
-    archive_contents *now_contents;
-    date_list *now_date;
     now_tree = tree;
-    std::string save_path = "./archive_contents/";
+    archive_contents *now_contents;
+    std::string save_path = "./build_page/contents/";
     std::string get_word;
+    std::string content_description;
     int size = data.size();
     int word_count = 0;
     int first_count = 0;
@@ -273,11 +265,13 @@ void creator::store_data_to_tree(creator::archive_tree *tree, creator::date_list
         if (get_word[0] == '&') {
             std::cout << "store contents" << std::endl;
             get_word =  get_word.substr(1, get_word.size() - 1);
+            content_description = get_word;
+            /*
             while (true) {
                 if (now_contents->url.empty()) {
                     std::cout << "empty" << std::endl;
                     now_contents->url = save_path + file;
-                    now_contents->description = get_word;
+                    now_contents->description = content_description;
                     std::cout << now_contents->url << std::endl;
                     std::cout << now_contents->description << std::endl;
                     break;
@@ -289,12 +283,13 @@ void creator::store_data_to_tree(creator::archive_tree *tree, creator::date_list
                     archive_contents *p = new creator::archive_contents;
                     now_contents->next = p;
                     p->url = save_path + file;
-                    now_contents->description = get_word;
+                    now_contents->description = content_description;
                     std::cout << now_contents->url << std::endl;
                     std::cout << now_contents->description << std::endl;
                     break;
                 }
             }
+            */
         } else if (get_word[0] == '%') {
             get_word = get_word.substr(1, get_word.size() - 1);
             std::cout << get_word << std::endl;
@@ -307,13 +302,10 @@ void creator::store_data_to_tree(creator::archive_tree *tree, creator::date_list
                     date_count++;
                 }
                 part_date = get_word.substr(date_first, date_count - date_first);
-                //std::cout << part_date.size() << std::endl;
                 if (part_date.size() == 1)
-                    //part_date.insert(part_date.begin() + 0, '0');
                     part_date = '0' + part_date;
                 
                 get_date = get_date + part_date;
-                std::cout << get_date << std::endl;
                 date_first = date_count;
                 date_count++;
                 date_first++;
@@ -321,17 +313,24 @@ void creator::store_data_to_tree(creator::archive_tree *tree, creator::date_list
             int content_date = stoi(get_date);
             printf("date : %d\n",content_date);
         
-        
-        
+            store_content(now_contents, save_path + file, get_word, content_description);
+            store_date(date, save_path + file, get_word, content_date, content_description);
         /*
-            now_date = date;
             while (true) {
                 if (now_date->url.empty()) {
                     std::cout << "date : empty" << std::endl;
-                } else if (  date is newer than (>=)  now_date) {
+                    now_date->url = save_path + file;
+                    now_date->description = content_description;
+                    now_date->date = get_word;
+                    now_date->date_num = content_date;
+                } else if (content_date >= now_date->date_num) {
                     date_list *p = new creator::date_list;
-                    p->next = now_list->next;
-                    now_list->next = p;
+                    p->url = save_path + file;
+                    p->description = content_description;
+                    p->date = get_word;
+                    p->date_num = content_date;
+                    p->next = now_date->next;
+                    now_date->next = p;
                     break;
                 }
                 
@@ -339,18 +338,14 @@ void creator::store_data_to_tree(creator::archive_tree *tree, creator::date_list
                     now_date = now_date->next;
                 } else {
                     date_list *p = new creator::date_list;
-                    now_list->next = p;
+                    p->url = save_path + file;
+                    p->description = content_description;
+                    p->date = get_word;
+                    p->date_num = content_date;
+                    p->next = now_date->next;
+                    now_date->next = p;
                     break;
                 }
-            
-            }
-          */  
-            
-            
-            /*
-            now_date = date;
-            while (true) {
-                if (now_date)            
             
             }
             */
@@ -363,8 +358,8 @@ void creator::store_data_to_tree(creator::archive_tree *tree, creator::date_list
                     std::cout << "found empty sector" << std::endl;
                     now_tree->name = get_word;
                 }
-                std::cout << "now name a" << now_tree->name << "a" << std::endl;
-                std::cout << "get name a" << get_word << "a" << std::endl;
+                std::cout << "now name  " << now_tree->name<< std::endl;
+                std::cout << "get name  " << get_word << std::endl;
                 std::cout << "result " << now_tree->name.compare(get_word) << std::endl;
                 
                 if (now_tree->name.compare(get_word) == 0) {//fail to compare
@@ -409,6 +404,70 @@ void creator::store_data_to_tree(creator::archive_tree *tree, creator::date_list
     }
 }
 
+void creator::store_content(creator::archive_contents *now_contents, std::string url, std::string date, std::string content_description)
+{
+//while (true) {
+    if (now_contents->url.empty()) {
+        std::cout << "empty" << std::endl;
+        now_contents->url = url;
+        now_contents->date = date;
+        now_contents->description = content_description;
+        std::cout << now_contents->url << std::endl;
+        std::cout << now_contents->description << std::endl;
+//break;
+    } else if (now_contents->next != nullptr) {
+        std::cout << "go next" << std::endl;
+        store_content(now_contents->next, url, date, content_description);
+    } else {
+        std::cout << "create new contents" << std::endl;
+        archive_contents *p = new creator::archive_contents;
+        p->url = url;
+        p->date = date;
+        p->description = content_description;
+        now_contents->next = p;
+
+        std::cout << now_contents->url << std::endl;
+        std::cout << now_contents->description << std::endl;
+//break;
+    }
+//}
+}
+
+void creator::store_date(creator::date_list *now_date, std::string url, std::string date, int content_date, std::string content_description)
+{
+    while (true) {
+        if (now_date->url.empty()) {
+            std::cout << "date : empty" << std::endl;
+            now_date->url = url;
+            now_date->description = content_description;
+            now_date->date = date;
+            now_date->date_num = content_date;
+        } else if (content_date >= now_date->date_num) {
+            date_list *p = new creator::date_list;
+            p->url = url;
+            p->description = content_description;
+            p->date = date;
+            p->date_num = content_date;
+            p->next = now_date->next;
+            now_date->next = p;
+            break;
+        }
+                
+        if (now_date -> next != nullptr) {
+            now_date = now_date->next;
+        } else {
+            date_list *p = new creator::date_list;
+            p->url = url;
+            p->description = content_description;
+            p->date = date;
+            p->date_num = content_date;
+            p->next = now_date->next;
+            now_date->next = p;
+            break;
+        }  
+    }
+}
+
 void creator::write_archive(creator::archive_tree *tree)
 {
     //sort_data();
@@ -421,8 +480,11 @@ void creator::sort_data()
 }
 
 //read and  tree
-void creator::print_tree(creator::config_tree * tree)
+void creator::print_tree(creator::config_tree *tree)
 {
+
+
+/*
     std::cout << tree->name << std::endl;
     if (tree->deeper != nullptr) {
         std::cout << "go deeper : " << tree->deeper->name << std::endl;
@@ -433,8 +495,14 @@ void creator::print_tree(creator::config_tree * tree)
         std::cout << "go next : " << tree->next->name << std::endl;
         print_tree(tree->next);
     }
+    
+    */
 }
 
+void creator::print_contents(creator::archive_contents *content)
+{
+
+}
 void creator::print_config_tree(creator::config_tree * tree)
 {
 
