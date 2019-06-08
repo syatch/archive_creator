@@ -22,7 +22,10 @@ void creator::create_archive()
     write_archive(archive_tree);
     std::cout << "fin" << std::endl;
     
-    print_tree(config_tree);
+    //print_tree(config_tree, 0);
+    print_tree(archive_tree, 0);
+    if (date_list != nullptr)
+        print_list(date_list);
 }
 
 //read archive.config
@@ -442,12 +445,19 @@ void creator::store_date(creator::date_list *now_date, std::string url, std::str
             now_date->description = content_description;
             now_date->date = date;
             now_date->date_num = content_date;
+            break;
         } else if (content_date >= now_date->date_num) {
             date_list *p = new creator::date_list;
-            p->url = url;
-            p->description = content_description;
-            p->date = date;
-            p->date_num = content_date;
+            p->url = now_date->url;
+            p->description = now_date->description;
+            p->date = now_date->date;
+            p->date_num = now_date->date_num;
+            
+            now_date->url = url;
+            now_date->description = content_description;
+            now_date->date = date;
+            now_date->date_num = content_date;
+            
             p->next = now_date->next;
             now_date->next = p;
             break;
@@ -461,10 +471,9 @@ void creator::store_date(creator::date_list *now_date, std::string url, std::str
             p->description = content_description;
             p->date = date;
             p->date_num = content_date;
-            p->next = now_date->next;
             now_date->next = p;
             break;
-        }  
+        }
     }
 }
 
@@ -480,8 +489,24 @@ void creator::sort_data()
 }
 
 //read and  tree
-void creator::print_tree(creator::config_tree *tree)
+void creator::print_tree(creator::config_tree *tree, int indent)
 {
+    std::cout << tree->name << std::endl;
+    if (tree->deeper != nullptr) {
+        std::cout << "go deeper : " << tree->deeper->name << std::endl;
+        print_tree(tree->deeper, 0);
+        std::cout << "end : " << tree->deeper->name << std::endl;
+    }
+    if (tree->next != nullptr) {
+        std::cout << "go next : " << tree->next->name << std::endl;
+        print_tree(tree->next, 0);
+    }
+}
+
+void creator::print_tree(creator::archive_tree *tree, int indent)
+{
+
+
 
 
 /*
@@ -499,10 +524,21 @@ void creator::print_tree(creator::config_tree *tree)
     */
 }
 
+void creator::print_list(creator::date_list *list)
+{
+    std::cout << list->date << std::endl;
+    std::cout << list->description << std::endl;
+    std::cout << list->url << std::endl << std::endl;
+
+    if (list->next != nullptr)
+        print_list(list->next);
+}
+
 void creator::print_contents(creator::archive_contents *content)
 {
 
 }
+
 void creator::print_config_tree(creator::config_tree * tree)
 {
 

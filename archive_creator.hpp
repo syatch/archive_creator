@@ -68,7 +68,9 @@ namespace archive_creator {
             void create_index();
             void create_hubs();
             void crate_contents();
-            void print_tree(creator::config_tree *);
+            void print_tree(creator::config_tree *, int);
+            void print_tree(creator::archive_tree *, int);
+            void print_list(creator::date_list *list);
             void print_contents(creator::archive_contents *);
             void print_config_tree(creator::config_tree *);
             
