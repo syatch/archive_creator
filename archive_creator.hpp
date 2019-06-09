@@ -63,8 +63,7 @@ namespace archive_creator {
             void store_date(creator::date_list *, std::string, std::string, int, std::string);
             
             
-            void delete_null_tree(creator::config_tree *);
-            void delete_null_tree(creator::archive_tree *);
+            bool delete_null_tree(creator::archive_tree *);
             void delete_null_tree(creator::archive_contents *);
             void delete_null_tree(creator::date_list *);
             

@@ -19,13 +19,20 @@ void creator::create_archive()
     create_archive_tree(archive_tree, config_tree, config_tree);
     //read&store files
     read_files(archive_tree, date_list);
-    write_archive(archive_tree);
+    
+    
+    print_tree(archive_tree, 0);
+    delete_null_tree(archive_tree);
+   // write_archive(archive_tree);
     std::cout << "fin" << std::endl;
     
+    
+    
     //print_tree(config_tree, 0);
-    print_tree(archive_tree, 0);
     if (date_list != nullptr)
         print_list(date_list);
+        
+    print_tree(archive_tree, 0);
     print_tree(config_tree, 0);
 }
 
@@ -478,14 +485,71 @@ void creator::store_date(creator::date_list *now_date, std::string url, std::str
     }
 }
 
-void creator::delete_null_tree(creator::config_tree *tree)
+bool creator::delete_null_tree(creator::archive_tree *tree)
 {
+    bool empty = false;
+    std::cout << "start : " << tree->name << std::endl;
 
-}
+    std::cout << tree->name  << " : if next" << std::endl;
+    if (tree->next != nullptr) {
+        std::cout << tree->name  << " : start check next" << std::endl;
+        empty = delete_null_tree(tree->next);
+        std::cout << tree->name  << " : if next empty" << std::endl;
+        if (empty) {
+            std::cout << tree->name  << " : next is empty" << tree->next->name << std::endl;
+            archive_tree *p;
+            p = &(tree->next);
+            if (tree->next->next != nullptr)
+                tree->next = tree->next->next;
+            else
+                tree->next = nullptr;
+            delete *p;
+        } else {
+            std::cout << tree->name  << " : next not empty" << std::endl;
+        }
+        std::cout << tree->name  << " : end check next" << std::endl;
+    } else {
+        std::cout << tree->name  << " : no next" << std::endl;
+    }
 
-void creator::delete_null_tree(creator::archive_tree *tree)
-{
+    empty = false;
+    std::cout << tree->name  << " : if deeper" << std::endl;
+    if (tree->deeper != nullptr) {
+        std::cout << tree->name  << " : start check deeper" << std::endl;
+        empty = delete_null_tree(tree->deeper);
+        std::cout << tree->name  << " : if deep empty " << empty << std::endl;
+        if (empty) {
+            std::cout << tree->name  << " : deeper is empty : " << tree->deeper->name << std::endl;
+            //archive_tree **p;
+            //p = &(tree->deeper);
+            //std::cout << tree->deeper->name  << " : end copy deeper :" << (*p)->name << std::endl;
+            
+            if (tree->deeper->next != nullptr)
+                tree->deeper = tree->deeper->next;
+            else
+                tree->deeper = nullptr;
+                
+            //std::cout << tree->name  << " : delete deeper :" << std::endl;//<< (*p)->name << std::endl;
+            //std::cout << tree->name  << " : delete deeper :" << (*p)->name << std::endl;
+            
+            //delete (*p);
+        } else {
+            std::cout << tree->name  << " : deep not empty" << std::endl;
+        }
+        std::cout << tree->name  << " : end check deeper" << std::endl;
+    } else {
+        std::cout << tree->name  << " : no deeper" << std::endl;
+    }
 
+
+
+    if ((tree->deeper == nullptr) && (tree->contents == nullptr)) {
+        std::cout  << "return empty : " << tree->name << std::endl;
+        return true;
+    } else {
+        std::cout  << "return not empty : " << tree->name << std::endl;
+        return false;
+    }    
 }
 
 void creator::delete_null_tree(creator::archive_contents *content)
@@ -517,10 +581,10 @@ void creator::print_tree(creator::config_tree *tree, int indent)
         print = " " + print;
     }
     std::cout << print + tree->name << std::endl;
-    if (tree->next != nullptr)
-        print_tree(tree->next, indent);
     if (tree->deeper != nullptr)
         print_tree(tree->deeper, indent + 1);
+    if (tree->next != nullptr)
+        print_tree(tree->next, indent);
 }
 
 void creator::print_tree(creator::archive_tree *tree, int indent)
