@@ -62,19 +62,24 @@ namespace archive_creator {
             //list date(string) date(int) url description
             void store_date(creator::date_list *, std::string, std::string, int, std::string);
             
+            
+            void delete_null_tree(creator::config_tree *);
+            void delete_null_tree(creator::archive_tree *);
+            void delete_null_tree(creator::archive_contents *);
+            void delete_null_tree(creator::date_list *);
+            
             void write_archive(creator::archive_tree *);
             
             void sort_data();
             void create_index();
             void create_hubs();
             void crate_contents();
+            
             void print_tree(creator::config_tree *, int);
             void print_tree(creator::archive_tree *, int);
             void print_list(creator::date_list *list);
-            void print_contents(creator::archive_contents *);
-            void print_config_tree(creator::config_tree *);
-            
-            
+            void print_contents(creator::archive_contents *, int);
+           
             void free(config_tree *);
         };
 }

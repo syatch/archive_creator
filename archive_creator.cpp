@@ -26,6 +26,7 @@ void creator::create_archive()
     print_tree(archive_tree, 0);
     if (date_list != nullptr)
         print_list(date_list);
+    print_tree(config_tree, 0);
 }
 
 //read archive.config
@@ -56,7 +57,7 @@ void creator::read_config(config_tree* tree)
         }
         if (str[0] == '#') {
             first_count++;
-            while (str[word_count] != ',' && word_count != size)
+            while (str[word_count] != ',' && word_count < size)
                 word_count++;
             //get title
             get_word =  str.substr(first_count ,word_count - first_count);
@@ -80,11 +81,11 @@ void creator::read_config(config_tree* tree)
         } else {
             //get priority
             bool first = true;
-            while (word_count <= size) {
+            while (word_count < size - 1) {
                 while (str[word_count] != ',' && word_count != size)
                     word_count++;
-                get_word = str.substr(first_count ,word_count - first_count);
-                std::cout << "get word : " << get_word << std::endl;
+                get_word = str.substr(first_count, word_count - first_count);
+                std::cout << "get word : " << get_word << first_count << word_count << std::endl;
                 word_count++;
                 first_count = word_count;
                 if (first) {
@@ -477,6 +478,26 @@ void creator::store_date(creator::date_list *now_date, std::string url, std::str
     }
 }
 
+void creator::delete_null_tree(creator::config_tree *tree)
+{
+
+}
+
+void creator::delete_null_tree(creator::archive_tree *tree)
+{
+
+}
+
+void creator::delete_null_tree(creator::archive_contents *content)
+{
+
+}
+
+void creator::delete_null_tree(creator::date_list *list)
+{
+
+}
+
 void creator::write_archive(creator::archive_tree *tree)
 {
     //sort_data();
@@ -488,58 +509,53 @@ void creator::sort_data()
     std::cout << "sort data" << std::endl;
 }
 
-//read and  tree
+//print tree for debug
 void creator::print_tree(creator::config_tree *tree, int indent)
 {
-    std::cout << tree->name << std::endl;
-    if (tree->deeper != nullptr) {
-        std::cout << "go deeper : " << tree->deeper->name << std::endl;
-        print_tree(tree->deeper, 0);
-        std::cout << "end : " << tree->deeper->name << std::endl;
+    std::string print;
+    for (int i = 0; i < indent; i++) {
+        print = " " + print;
     }
-    if (tree->next != nullptr) {
-        std::cout << "go next : " << tree->next->name << std::endl;
-        print_tree(tree->next, 0);
-    }
+    std::cout << print + tree->name << std::endl;
+    if (tree->next != nullptr)
+        print_tree(tree->next, indent);
+    if (tree->deeper != nullptr)
+        print_tree(tree->deeper, indent + 1);
 }
 
 void creator::print_tree(creator::archive_tree *tree, int indent)
 {
-
-
-
-
-/*
-    std::cout << tree->name << std::endl;
-    if (tree->deeper != nullptr) {
-        std::cout << "go deeper : " << tree->deeper->name << std::endl;
-        print_tree(tree->deeper);
-        std::cout << "end : " << tree->deeper->name << std::endl;
+    std::string print;
+    for (int i = 0; i < indent; i++) {
+        print = " " + print;
     }
-    if (tree->next != nullptr) {
-        std::cout << "go next : " << tree->next->name << std::endl;
-        print_tree(tree->next);
-    }
-    
-    */
+    std::cout << print + tree->name << std::endl;
+    if (tree->deeper != nullptr)
+        print_tree(tree->deeper, indent + 1);
+    if(tree->contents != nullptr)
+        print_contents(tree->contents, indent + 1);
+    if (tree->next != nullptr)
+        print_tree(tree->next, indent);
 }
 
 void creator::print_list(creator::date_list *list)
 {
     std::cout << list->date << std::endl;
     std::cout << list->description << std::endl;
-    std::cout << list->url << std::endl << std::endl;
+    std::cout << list->url << std::endl;
 
     if (list->next != nullptr)
         print_list(list->next);
 }
 
-void creator::print_contents(creator::archive_contents *content)
+void creator::print_contents(creator::archive_contents *content, int indent)
 {
-
-}
-
-void creator::print_config_tree(creator::config_tree * tree)
-{
-
+    std::string print;
+    for (int i = 0; i < indent; i++) {
+        print = " " + print;
+    }
+    std::cout << print +  "コンテンツ" << std::endl;
+    std::cout << print +  content->description << std::endl;
+    if (content->next != nullptr)
+        print_contents(content->next, indent);
 }
