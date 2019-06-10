@@ -13,12 +13,18 @@ void creator::create_archive()
     config_tree *config_tree = new creator::config_tree;
     archive_tree *archive_tree = new creator::archive_tree;
     date_list *date_list = new creator::date_list;
+    std::string contents_path = "./archive_contents/";
     //read archive.config and store data
     read_config(config_tree);
     //create archive_tree
     create_archive_tree(archive_tree, config_tree, config_tree);
     //read&store files
-    read_files(archive_tree, date_list);
+    std::vector<std::string> file_names;
+    file_names.clear();
+    //get name of files in contents_path
+    get_files(contents_path, file_names);
+    //store contents data to tree
+    store_file_data(archive_tree, date_list, file_names, contents_path);
     //delete tree that not used to store data
     delete_null_tree(archive_tree);
     
@@ -26,12 +32,19 @@ void creator::create_archive()
     //write_archive(archive_tree);
     
     //print_tree(config_tree, 0);
-    if (date_list != nullptr)
-        print_list(date_list);
-    if (archive_tree != nullptr)
-        print_tree(archive_tree, 0);
-    if (config_tree != nullptr)
+    if (config_tree != nullptr) {
         print_tree(config_tree, 0);
+        delete_tree(&config_tree);
+    }
+    if (archive_tree != nullptr) {
+        print_tree(archive_tree, 0);
+        delete_tree(&archive_tree);
+    }
+    if (date_list != nullptr) {
+        print_list(date_list);
+        delete_list(&date_list);
+    }
+    
     std::cout << "fin" << std::endl;
 }
 
@@ -136,9 +149,9 @@ void creator::create_archive_tree(creator::archive_tree *tree, creator::config_t
     }
 }
 
+/*
 //get contents file name & store data
 void creator::read_files(creator::archive_tree *tree, creator::date_list *date)
-{
     std::vector<std::string> file_names;
     file_names.clear();
     std::string contents_path = "./archive_contents/";
@@ -147,6 +160,7 @@ void creator::read_files(creator::archive_tree *tree, creator::date_list *date)
     //store contents data to tree
     store_file_data(tree, date, file_names, contents_path);
 }
+*/
 
 //get contents file name
 void creator::get_files(std::string path, std::vector<std::string> &file_names)
@@ -408,26 +422,31 @@ bool creator::delete_null_tree(creator::archive_tree *tree)
         return false;    
 }
 
-void creator::delete_null_tree(creator::archive_contents *content)
+void creator::write_archive(creator::archive_tree *tree, int indent)
 {
-
-}
-
-void creator::delete_null_tree(creator::date_list *list)
-{
-
-}
-
-void creator::write_archive(creator::archive_tree *tree)
-{
-    //sort_data();
-    std::cout << "write archive" << std::endl;
+    std::string print;
+    for (int i = 0; i < indent; i++)
+        print = " " + print;
+   
+    std::cout << print + tree->name << std::endl;
+    if (tree->deeper != nullptr)
+        print_tree(tree->deeper, indent + 1);
+    if(tree->contents != nullptr)
+        print_contents(tree->contents, indent + 1);
+    if (tree->next != nullptr)
+        print_tree(tree->next, indent);
 }
 
 void creator::sort_data()
 {
     std::cout << "sort data" << std::endl;
 }
+/*
+void create_index();
+void create_hubs();
+void crate_contents();
+*/
+
 
 //print tree for debug
 void creator::print_tree(creator::config_tree *tree, int indent)
@@ -477,4 +496,39 @@ void creator::print_contents(creator::archive_contents *content, int indent)
     std::cout << print + ":" + content->description << std::endl;
     if (content->next != nullptr)
         print_contents(content->next, indent);
+}
+
+void creator::delete_tree(creator::config_tree **tree)
+{
+    if ((*tree)->next != nullptr)
+        delete_tree(&(*tree)->next);
+    if ((*tree)->deeper != nullptr)
+        delete_tree(&(*tree)->deeper);
+    delete *tree;
+}
+
+void creator::delete_tree(creator::archive_tree **tree)
+{
+    if ((*tree)->next != nullptr)
+        delete_tree(&(*tree)->next);
+    if ((*tree)->deeper != nullptr)
+        delete_tree(&(*tree)->deeper);
+    if ((*tree)->contents != nullptr)
+        delete_tree(&(*tree)->contents);
+    delete *tree;
+}
+
+void creator::delete_tree(creator::archive_contents **tree)
+{
+    if ((*tree)->next != nullptr)
+        delete_tree(&(*tree)->next);
+    delete *tree;
+
+}
+
+void creator::delete_list(creator::date_list **list)
+{
+    if ((*list)->next != nullptr)
+        delete_list(&(*list)->next);
+    delete *list;
 }
