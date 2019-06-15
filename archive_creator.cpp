@@ -28,9 +28,16 @@ void creator::create_archive()
     //delete tree that not used to store data
     delete_null_tree(archive_tree);
     
+    std::string page_path = "./pages/";
+    file_names.clear();
+    get_files(contents_path, file_names);
     
-    //write_archive(archive_tree);
+    create_archive_text(archive_tree, file_names);
     
+    write_archive(archive_tree, 0);
+    
+    
+    /*
     //print_tree(config_tree, 0);
     if (config_tree != nullptr) {
         print_tree(config_tree, 0);
@@ -44,7 +51,7 @@ void creator::create_archive()
         print_list(date_list);
         delete_list(&date_list);
     }
-    
+    */
     std::cout << "fin" << std::endl;
 }
 
@@ -121,6 +128,7 @@ void creator::read_config(config_tree* tree)
     }
 }
 
+//create archive tree from config
 void creator::create_archive_tree(creator::archive_tree *tree, creator::config_tree *now_config, creator::config_tree *root_config)
 {
     //if this config has name, store
@@ -148,19 +156,6 @@ void creator::create_archive_tree(creator::archive_tree *tree, creator::config_t
         create_archive_tree(p, root_config->deeper->next, root_config->deeper);
     }
 }
-
-/*
-//get contents file name & store data
-void creator::read_files(creator::archive_tree *tree, creator::date_list *date)
-    std::vector<std::string> file_names;
-    file_names.clear();
-    std::string contents_path = "./archive_contents/";
-    //get name of files in contents_path/
-    get_files(contents_path, file_names);
-    //store contents data to tree
-    store_file_data(tree, date, file_names, contents_path);
-}
-*/
 
 //get contents file name
 void creator::get_files(std::string path, std::vector<std::string> &file_names)
@@ -422,6 +417,85 @@ bool creator::delete_null_tree(creator::archive_tree *tree)
         return false;    
 }
 
+void creator::create_archive_text(creator::archive_tree *tree, std::vector<std::string> &files)
+{
+    //create index_text
+    std::vector<std::string> index_texts;
+    index_texts.clear();
+    create_index_text(index_texts);
+
+    //create hub_text
+    std::vector<std::string> hub_texts;
+    hub_texts.clear();
+    create_hub_text(hub_texts);
+    
+    /*
+    for (int i = 0; i < index_texts.size(); i++) {
+        std::cout << index_texts[i] << std::endl;
+    }
+    for (int i = 0; i < hub_texts.size(); i++) {
+        std::cout << hub_texts[i] << std::endl;
+    }
+    */
+    
+    //create menu index and hub
+    for (int i = 0; i < files.size(); i += 1) {        
+        bool no_index = create_index(index_texts, files[i]);
+        if (no_index)
+            create_hub(hub_texts, files[i]);
+    }
+}
+
+void creator::create_index_text(std::vector<std::string> &texts)
+{
+    std::ifstream config("archive_index_text.config");
+    if (config.fail()) {
+        std::cerr << "failed to open archive_index_text.config" << std::endl;
+        return;
+    }
+    std::istreambuf_iterator<char> it(config);
+    std::istreambuf_iterator<char> last;
+    std::string str(it, last);
+
+    int start = 0;
+    for (int i = 0; i < str.size(); i++) {
+        if (str[i] == '$')
+            start = i + 1;
+        if (str[i] == '#')
+            texts.push_back(str.substr(start, i - start));
+    } 
+}
+
+void creator::create_hub_text(std::vector<std::string> &texts)
+{
+    std::ifstream config("archive_hub_text.config");
+    if (config.fail()) {
+        std::cerr << "failed to open archive_index_text.config" << std::endl;
+        return;
+    }
+    std::istreambuf_iterator<char> it(config);
+    std::istreambuf_iterator<char> last;
+    std::string str(it, last);
+
+    int start = 0;
+    for (int i = 0; i < str.size(); i++) {
+        if (str[i] == '$')
+            start = i + 1;
+        if (str[i] == '#')
+            texts.push_back(str.substr(start, i - start));
+    } 
+}
+
+bool creator::create_index(std::vector<std::string> &, std::string)
+{
+
+}
+
+void creator::create_hub(std::vector<std::string> &, std::string)
+{
+
+}
+
 void creator::write_archive(creator::archive_tree *tree, int indent)
 {
     std::string print;
@@ -437,10 +511,13 @@ void creator::write_archive(creator::archive_tree *tree, int indent)
         print_tree(tree->next, indent);
 }
 
+
+/*
 void creator::sort_data()
 {
     std::cout << "sort data" << std::endl;
 }
+*/
 /*
 void create_index();
 void create_hubs();
