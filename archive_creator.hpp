@@ -53,35 +53,34 @@ namespace archive_creator {
             ////get contents file name & store data
             //void read_files(creator::archive_tree *, creator::date_list *);
             //get file names of files in path
-            void get_files(std::string, std::vector<std::string> &);
+            void get_files(std::vector<std::string> &, std::string);
             //create content files
-            void create_contents(std::string, std::vector<std::string> &);
+            void create_contents(std::vector<std::string> &, std::string, std::string);
             //store file data to archive tree
-            void store_file_data(creator::archive_tree *, creator::date_list *, std::vector<std::string> &, std::string);
+            void store_file_data(creator::archive_tree *, creator::date_list *, std::vector<std::string> &, std::string, std::string);
             //get config data of file
             void get_data_of_file(std::string , std::string &);
             //store data to archive tree
-            void store_data_to_tree(creator::archive_tree *, creator::date_list *,std::string , std::string &);
+            void store_data_to_tree(creator::archive_tree *, creator::date_list *,std::string , std::string &, std::string);
             //content  url date description
             void store_content(creator::archive_contents *, std::string, std::string, std::string);
             //list date(string) date(int) url description
             void store_date(creator::date_list *, std::string, std::string, int, std::string);
+            //delete empty tree
             bool delete_null_tree(creator::archive_tree *);
-            
-            
-            
-            void sort_data();
-            
             //create_archive_hub
             void create_archive_text(archive_tree *, std::vector<std::string> &, std::string);
             std::string create_index_text(archive_tree *);
+            
+            
             void create_hub_text(std::vector<std::string> &);//not use
+            
             void create_index(std::string, std::string, std::string);
             void create_hub(creator::archive_tree *, std::vector<std::string> &, std::string, std::string);//not use
             //write archive
             void write_archive(creator::archive_tree *, int);
             
-            void crate_contents();
+            
             
             //print data
             void print_tree(creator::config_tree *, int);

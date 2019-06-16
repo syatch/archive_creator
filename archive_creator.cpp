@@ -22,17 +22,20 @@ void creator::create_archive()
     std::vector<std::string> file_names;
     file_names.clear();
     //get name of files in contents_path
-    get_files(contents_path, file_names);
+    get_files(file_names, contents_path);
     //creates_content files
-    create_contents(contents_path, file_names);
+    std::string save_path = "./build_page/contents/";
+    create_contents(file_names, contents_path, save_path);
     //store contents data to tree
-    store_file_data(archive_tree, date_list, file_names, contents_path);
+    store_file_data(archive_tree, date_list, file_names, contents_path, save_path);
     //delete tree that not used to store data
     delete_null_tree(archive_tree);
+    //create hub page
+    //create_hubs(archive_tree, contents_path);
     
     std::string page_path = "./pages/";
     file_names.clear();
-    get_files(page_path, file_names);
+    get_files(file_names, page_path);
     
     create_archive_text(archive_tree, file_names, page_path);
     
@@ -60,7 +63,7 @@ void creator::create_archive()
 //read archive.config
 void creator::read_config(config_tree* tree)
 {
-    std::ifstream config("archive.config");
+    std::ifstream config("./config/archive.config");
     if (config.fail()) {
         std::cerr << "Failed to open archive.config" << std::endl;
     }    
@@ -161,7 +164,7 @@ void creator::create_archive_tree(creator::archive_tree *tree, creator::config_t
 }
 
 //get contents file name
-void creator::get_files(std::string path, std::vector<std::string> &file_names)
+void creator::get_files(std::vector<std::string> &file_names, std::string path)
 {
     int dirElements;
     std::string search_path;
@@ -190,9 +193,7 @@ void creator::get_files(std::string path, std::vector<std::string> &file_names)
     std::free(namelist);
 }
 
-void creator::create_contents(std::string path, std::vector<std::string> &files) {
-std::cout << "create_contents" << std::endl;
-//std::string path = "./archive_contents"
+void creator::create_contents(std::vector<std::string> &files, std::string path, std::string save_path) {
     std::ifstream template_file("./archive_template/archive_contents_template.html");
     if (template_file.fail()) {
         std::cerr << "failed to open " << "./archive_template/archive_contents_template.html" << std::endl;
@@ -224,10 +225,8 @@ std::cout << "create_contents" << std::endl;
                     break;
                 }
             }
-            std::cout << files[i] << std::endl;
             std::string str = template_str.substr(0, place) + "\n" + contents_str + template_str.substr(place, str.size() - place);
-            std::cout << str << std::endl;
-            std::ofstream outfile("./build_page/contents/" + files[i].substr(path.size(), files[i].size()-path.size()));
+            std::ofstream outfile(save_path + files[i].substr(path.size(), files[i].size()-path.size()));
             outfile<<str;
             outfile.close();
         }
@@ -235,12 +234,12 @@ std::cout << "create_contents" << std::endl;
 }
 
 //store data of contents
-void creator::store_file_data(creator::archive_tree *tree, creator::date_list *date, std::vector<std::string> &files, std::string path)
+void creator::store_file_data(creator::archive_tree *tree, creator::date_list *date, std::vector<std::string> &files, std::string path, std::string save_path)
 {
     for (int i = 0; i < files.size(); i++) {
         std::string data;
         get_data_of_file(files[i], data);
-        store_data_to_tree(tree, date, files[i].substr(path.size(), files[i].size()-path.size()), data);
+        store_data_to_tree(tree, date, files[i].substr(path.size(), files[i].size()-path.size()), data, save_path);
     }
 }
 
@@ -277,12 +276,11 @@ void creator::get_data_of_file(std::string file, std::string &data)
     contents.close();
 }
 
-void creator::store_data_to_tree(creator::archive_tree *tree, creator::date_list *date, std::string file, std::string &data)
+void creator::store_data_to_tree(creator::archive_tree *tree, creator::date_list *date, std::string file, std::string &data, std::string save_path)
 {
     archive_tree *now_tree;
     now_tree = tree;
     archive_contents *now_contents;
-    std::string save_path = "./build_page/contents/";
     std::string get_word;
     std::string content_description;
     int size = data.size();
@@ -487,7 +485,7 @@ void creator::create_archive_text(creator::archive_tree *tree, std::vector<std::
 
 std::string creator::create_index_text(creator::archive_tree *tree)
 {
-    std::ifstream config("archive_index_text.config");
+    std::ifstream config("./config/archive_index_text.config");
     if (config.fail()) {
         std::cerr << "failed to open archive_index_text.config" << std::endl;
     }
@@ -520,7 +518,7 @@ std::string creator::create_index_text(creator::archive_tree *tree)
 
 void creator::create_hub_text(std::vector<std::string> &texts)
 {
-    std::ifstream config("archive_hub_text.config");
+    std::ifstream config("./config/archive_hub_text.config");
     if (config.fail()) {
         std::cerr << "failed to open archive_index_text.config" << std::endl;
         return;
@@ -604,20 +602,6 @@ void creator::write_archive(creator::archive_tree *tree, int indent)
     if (tree->next != nullptr)
         print_tree(tree->next, indent);
 }
-
-
-/*
-void creator::sort_data()
-{
-    std::cout << "sort data" << std::endl;
-}
-*/
-/*
-void create_index();
-void create_hubs();
-void crate_contents();
-*/
-
 
 //print tree for debug
 void creator::print_tree(creator::config_tree *tree, int indent)
