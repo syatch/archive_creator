@@ -54,6 +54,8 @@ namespace archive_creator {
             //void read_files(creator::archive_tree *, creator::date_list *);
             //get file names of files in path
             void get_files(std::string, std::vector<std::string> &);
+            //create content files
+            void create_contents(std::string, std::vector<std::string> &);
             //store file data to archive tree
             void store_file_data(creator::archive_tree *, creator::date_list *, std::vector<std::string> &, std::string);
             //get config data of file

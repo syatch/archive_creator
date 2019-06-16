@@ -23,6 +23,8 @@ void creator::create_archive()
     file_names.clear();
     //get name of files in contents_path
     get_files(contents_path, file_names);
+    //creates_content files
+    create_contents(contents_path, file_names);
     //store contents data to tree
     store_file_data(archive_tree, date_list, file_names, contents_path);
     //delete tree that not used to store data
@@ -188,10 +190,54 @@ void creator::get_files(std::string path, std::vector<std::string> &file_names)
     std::free(namelist);
 }
 
+void creator::create_contents(std::string path, std::vector<std::string> &files) {
+std::cout << "create_contents" << std::endl;
+//std::string path = "./archive_contents"
+    std::ifstream template_file("./archive_template/archive_contents_template.html");
+    if (template_file.fail()) {
+        std::cerr << "failed to open " << "./archive_template/archive_contents_template.html" << std::endl;
+    }
+    std::istreambuf_iterator<char> template_it(template_file);
+    std::istreambuf_iterator<char> template_last;
+    std::string template_str(template_it, template_last);
+    template_file.close();
+    
+    for (int i = 0; i < files.size(); i++) {      
+        if (files[i].substr(files[i].size() - 5, 5) == ".html") {
+            std::ifstream contents_file(files[i]);
+            if (contents_file.fail()) {
+                std::cerr << "failed to open " << files[i] << std::endl;
+            }
+            
+            std::istreambuf_iterator<char> contents_it(contents_file);
+            std::istreambuf_iterator<char> contents_last;
+            std::string contents_str(contents_it, contents_last);
+            contents_file.close();
+            
+            bool index = false;
+            int place;
+            for (int i = 0; i < template_str.size() - 16; i++) {
+                if (template_str.substr(i, 16) == "archive_contents")
+                    index = true;
+                if ((index == true) && (template_str[i + 16] == '>')) {
+                    place = i + 17;
+                    break;
+                }
+            }
+            std::cout << files[i] << std::endl;
+            std::string str = template_str.substr(0, place) + "\n" + contents_str + template_str.substr(place, str.size() - place);
+            std::cout << str << std::endl;
+            std::ofstream outfile("./build_page/contents/" + files[i].substr(path.size(), files[i].size()-path.size()));
+            outfile<<str;
+            outfile.close();
+        }
+    }
+}
+
 //store data of contents
 void creator::store_file_data(creator::archive_tree *tree, creator::date_list *date, std::vector<std::string> &files, std::string path)
 {
-    for (int i = 0; i < files.size(); i += 1) {
+    for (int i = 0; i < files.size(); i++) {
         std::string data;
         get_data_of_file(files[i], data);
         store_data_to_tree(tree, date, files[i].substr(path.size(), files[i].size()-path.size()), data);
@@ -275,7 +321,6 @@ void creator::store_data_to_tree(creator::archive_tree *tree, creator::date_list
                 date_first++;
             }
             int content_date = stoi(get_date);
-        
             store_content(now_contents, save_path + file, get_word, content_description);
             store_date(date, save_path + file, get_word, content_date, content_description);
         } else if (get_word[0] == '!') {
@@ -438,7 +483,6 @@ void creator::create_archive_text(creator::archive_tree *tree, std::vector<std::
     //create menu index
     for (int i = 0; i < files.size(); i += 1)    
         create_index(index_texts, files[i], path);
-    //create_pages(tree);
 }
 
 std::string creator::create_index_text(creator::archive_tree *tree)
@@ -474,7 +518,6 @@ std::string creator::create_index_text(creator::archive_tree *tree)
     return result;
 }
 
-/*
 void creator::create_hub_text(std::vector<std::string> &texts)
 {
     std::ifstream config("archive_hub_text.config");
@@ -495,7 +538,6 @@ void creator::create_hub_text(std::vector<std::string> &texts)
     } 
     config.close();
 }
-*/
 
 void creator::create_index(std::string text, std::string search_file, std::string path)
 {
@@ -521,7 +563,7 @@ void creator::create_index(std::string text, std::string search_file, std::strin
         }
         
         if (index) {
-            str = str.substr(0, place) + text + str.substr(place, str.size() - (place + text.size()));
+            str = str.substr(0, place) + text + str.substr(place, str.size() - place);
             std::ofstream outfile("./build_page/" + search_file.substr(path.size(), search_file.size()-path.size()));
             outfile<<str;
             outfile.close();
