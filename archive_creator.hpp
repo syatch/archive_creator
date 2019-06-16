@@ -71,11 +71,11 @@ namespace archive_creator {
             void sort_data();
             
             //create_archive_hub
-            void create_archive_text(archive_tree *, std::vector<std::string> &);
-            void create_index_text(std::vector<std::string> &);
-            void create_hub_text(std::vector<std::string> &);
-            bool create_index(std::vector<std::string> &, std::string);
-            void create_hub(std::vector<std::string> &, std::string);
+            void create_archive_text(archive_tree *, std::vector<std::string> &, std::string);
+            std::string create_index_text(archive_tree *);
+            void create_hub_text(std::vector<std::string> &);//not use
+            void create_index(std::string, std::string, std::string);
+            void create_hub(creator::archive_tree *, std::vector<std::string> &, std::string, std::string);//not use
             //write archive
             void write_archive(creator::archive_tree *, int);
             

@@ -30,9 +30,9 @@ void creator::create_archive()
     
     std::string page_path = "./pages/";
     file_names.clear();
-    get_files(contents_path, file_names);
+    get_files(page_path, file_names);
     
-    create_archive_text(archive_tree, file_names);
+    create_archive_text(archive_tree, file_names, page_path);
     
     write_archive(archive_tree, 0);
     
@@ -126,6 +126,7 @@ void creator::read_config(config_tree* tree)
             now_place = head_place;
         }
     }
+    config.close();
 }
 
 //create archive tree from config
@@ -227,6 +228,7 @@ void creator::get_data_of_file(std::string file, std::string &data)
     } else {
         std::cout << "ERROR couldn't get strings" << std::endl << std::endl;
     }     
+    contents.close();
 }
 
 void creator::store_data_to_tree(creator::archive_tree *tree, creator::date_list *date, std::string file, std::string &data)
@@ -417,45 +419,39 @@ bool creator::delete_null_tree(creator::archive_tree *tree)
         return false;    
 }
 
-void creator::create_archive_text(creator::archive_tree *tree, std::vector<std::string> &files)
+void creator::create_archive_text(creator::archive_tree *tree, std::vector<std::string> &files, std::string path)
 {
     //create index_text
-    std::vector<std::string> index_texts;
-    index_texts.clear();
-    create_index_text(index_texts);
-
-    //create hub_text
+    std::string index_texts;
+    index_texts = create_index_text(tree);
+    //create hub_text    
     std::vector<std::string> hub_texts;
     hub_texts.clear();
     create_hub_text(hub_texts);
-    
     /*
-    for (int i = 0; i < index_texts.size(); i++) {
-        std::cout << index_texts[i] << std::endl;
-    }
+    std::cout << index_texts << std::endl;
     for (int i = 0; i < hub_texts.size(); i++) {
         std::cout << hub_texts[i] << std::endl;
     }
     */
     
-    //create menu index and hub
-    for (int i = 0; i < files.size(); i += 1) {        
-        bool no_index = create_index(index_texts, files[i]);
-        if (no_index)
-            create_hub(hub_texts, files[i]);
-    }
+    //create menu index
+    for (int i = 0; i < files.size(); i += 1)    
+        create_index(index_texts, files[i], path);
+    //create_pages(tree);
 }
 
-void creator::create_index_text(std::vector<std::string> &texts)
+std::string creator::create_index_text(creator::archive_tree *tree)
 {
     std::ifstream config("archive_index_text.config");
     if (config.fail()) {
         std::cerr << "failed to open archive_index_text.config" << std::endl;
-        return;
     }
     std::istreambuf_iterator<char> it(config);
     std::istreambuf_iterator<char> last;
     std::string str(it, last);
+    std::vector<std::string> texts;
+    texts.clear();
 
     int start = 0;
     for (int i = 0; i < str.size(); i++) {
@@ -464,8 +460,21 @@ void creator::create_index_text(std::vector<std::string> &texts)
         if (str[i] == '#')
             texts.push_back(str.substr(start, i - start));
     } 
+    std::string result;
+    result += texts[0];
+    result += texts[1];
+    archive_tree *now;
+    now = tree;
+    int num = 0;
+    while (now != nullptr) {
+        result += texts[2] + "hub" + std::to_string(num++) + ".html" + texts[3] + now->name + texts[4];
+        now = now->next;
+    }
+    result += texts[5];
+    return result;
 }
 
+/*
 void creator::create_hub_text(std::vector<std::string> &texts)
 {
     std::ifstream config("archive_hub_text.config");
@@ -484,15 +493,58 @@ void creator::create_hub_text(std::vector<std::string> &texts)
         if (str[i] == '#')
             texts.push_back(str.substr(start, i - start));
     } 
+    config.close();
 }
+*/
 
-bool creator::create_index(std::vector<std::string> &, std::string)
+void creator::create_index(std::string text, std::string search_file, std::string path)
 {
 
+    if (search_file.substr(search_file.size() - 5, 5) == ".html") {
+        std::ifstream file(search_file);
+        if (file.fail()) {
+            std::cerr << "failed to open " << search_file << std::endl;
+        }
+        std::istreambuf_iterator<char> it(file);
+        std::istreambuf_iterator<char> last;
+        std::string str(it, last);
+        file.close();
+        bool index = false;
+        int place;
+        for (int i = 0; i < str.size() - 12; i++) {
+            if (str.substr(i, 12) == "archive_main")
+                index = true;
+            if ((index == true) && (str[i + 12] == '>')) {
+                place = i + 13;
+                break;
+            }
+        }
+        
+        if (index) {
+            str = str.substr(0, place) + text + str.substr(place, str.size() - (place + text.size()));
+            std::ofstream outfile("./build_page/" + search_file.substr(path.size(), search_file.size()-path.size()));
+            outfile<<str;
+            outfile.close();
+        }
+    }
 }
 
-void creator::create_hub(std::vector<std::string> &, std::string)
+void creator::create_hub(creator::archive_tree *tree, std::vector<std::string> &texts, std::string search_file, std::string path)
 {
+std::cout << "start create hub" << std::endl;
+std::cout << search_file.substr(path.size(), search_file.size()-path.size()) << std::endl;
+
+
+
+
+
+
+
+
+
+
+
+
 
 }
 
