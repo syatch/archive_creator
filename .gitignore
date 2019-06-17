@@ -1,1 +1,16 @@
-build/
+build/CMakeFiles/
+build/Makefile
+build/CMakeCache.txt
+build/pages/*
+build/archive_contents/*
+build/archive_template/*
+build/build_page/css/syatch*
+build/build_page/*.html
+build/build_page/*.ico
+build/build_page/fonts
+build/build_page/pictures
+build/build_page/contents/*
+build/archive_creator
+build/cmake_install.cmake
+
+

@@ -1,0 +1,52 @@
+﻿@font-face {
+	font-family: IPAex-Myotyo;
+	src: url('../fonts/ipaexm.ttf');	
+}
+
+/*動作*/
+.archive_link {
+    transition: transform 0.3s;
+}
+
+.archive_link:hover {
+    transition: transform 0.3s;
+    padding : 6px 0px;
+    transform: scale(1.15,1.15);
+    -webkit-transform: scale(1.15,1.15);
+    -moz-transform: scale(1.15,1.15);
+    -o-transform: scale(1.15,1.15);
+    -ms-transform: scale(1.15,1.15);    
+}
+
+a.archive_base {
+    transition: color 0.3s;
+}
+
+a.archive_base:hover {
+    color : orange;
+}
+
+/*文字のスタイル*/
+.archive_base {
+    color:#660066;
+    font-family: "IPAex-Myotyo";
+    font-size: 30px;
+    font-weight:bold;
+    text-shadow: 2px 2px 3px white,
+    -2px 2px 3px white,
+    2px -2px 3px white,
+    -2px -2px 3px white;
+    text-decoration: none;
+}
+
+.archive_bigfont {
+    color: yellow;
+    font-family: "IPAex-Myotyo";
+    font-size: 40px;
+    font-weight: bold;
+    text-shadow: 2px 2px 3px orange,
+    -2px 2px 3px orange,
+    2px -2px 3px orange,
+    -2px -2px 3px orange;
+}
+
