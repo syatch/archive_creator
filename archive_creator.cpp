@@ -23,25 +23,22 @@ void creator::create_archive()
     file_names.clear();
     //get name of files in contents_path
     get_files(file_names, contents_path);
-    //creates_content files
-    std::string save_path = "./build_page/contents/";
-    create_contents(file_names, contents_path, save_path);
+    std::string save_path = "./contents/";
     //store contents data to tree
     store_file_data(archive_tree, date_list, file_names, contents_path, save_path);
     //delete tree that not used to store data
     delete_null_tree(archive_tree);
-    //create hub page
-    //create_hubs(archive_tree, contents_path);
-    
+    //set path of contents
+    save_path = "./build_page/contents/";
+    //creates_content files
+    create_contents(file_names, contents_path, save_path);
+    //set path of pages
     std::string page_path = "./pages/";
     file_names.clear();
+    //get name of files in page_path
     get_files(file_names, page_path);
-    
+    //create_archive_
     create_archive_text(archive_tree, file_names, page_path);
-    
-    write_archive(archive_tree, 0);
-    
-    
     /*
     //print_tree(config_tree, 0);
     if (config_tree != nullptr) {
@@ -57,7 +54,6 @@ void creator::create_archive()
         delete_list(&date_list);
     }
     */
-    std::cout << "fin" << std::endl;
 }
 
 //read archive.config
@@ -66,7 +62,9 @@ void creator::read_config(config_tree* tree)
     std::ifstream config("./config/archive.config");
     if (config.fail()) {
         std::cerr << "Failed to open archive.config" << std::endl;
-    }    
+        return;
+    }
+
     bool first = true;
     std::string str;
     std::string get_word;
@@ -94,8 +92,7 @@ void creator::read_config(config_tree* tree)
                 tree->name = get_word;
                 now_place = tree;
                 first = false;
-            }
-            else {
+            } else {
                 config_tree *p = new creator::config_tree;
                 p->name = get_word;
                 now_tree->next = p;
@@ -171,10 +168,9 @@ void creator::get_files(std::vector<std::string> &file_names, std::string path)
     struct stat stat_buf;
     struct dirent **namelist=NULL;
     dirElements = scandir(path.c_str(), &namelist, NULL, NULL);
-    if(dirElements == -1) {
+    if (dirElements == -1) {
         std::cout << "ERROR : No elements" <<  std::endl;
-    }
-    else{
+    } else {
         for (int i = 0; i < dirElements; i++) {
             if( (strcmp(namelist[i]->d_name , ".\0") != 0) && (strcmp(namelist[i]->d_name , "..\0") != 0) ) {
                 search_path = path + std::string(namelist[i]->d_name);
@@ -193,46 +189,6 @@ void creator::get_files(std::vector<std::string> &file_names, std::string path)
     std::free(namelist);
 }
 
-void creator::create_contents(std::vector<std::string> &files, std::string path, std::string save_path) {
-    std::ifstream template_file("./archive_template/archive_contents_template.html");
-    if (template_file.fail()) {
-        std::cerr << "failed to open " << "./archive_template/archive_contents_template.html" << std::endl;
-    }
-    std::istreambuf_iterator<char> template_it(template_file);
-    std::istreambuf_iterator<char> template_last;
-    std::string template_str(template_it, template_last);
-    template_file.close();
-    
-    for (int i = 0; i < files.size(); i++) {      
-        if (files[i].substr(files[i].size() - 5, 5) == ".html") {
-            std::ifstream contents_file(files[i]);
-            if (contents_file.fail()) {
-                std::cerr << "failed to open " << files[i] << std::endl;
-            }
-            
-            std::istreambuf_iterator<char> contents_it(contents_file);
-            std::istreambuf_iterator<char> contents_last;
-            std::string contents_str(contents_it, contents_last);
-            contents_file.close();
-            
-            bool index = false;
-            int place;
-            for (int i = 0; i < template_str.size() - 16; i++) {
-                if (template_str.substr(i, 16) == "archive_contents")
-                    index = true;
-                if ((index == true) && (template_str[i + 16] == '>')) {
-                    place = i + 17;
-                    break;
-                }
-            }
-            std::string str = template_str.substr(0, place) + "\n" + contents_str + template_str.substr(place, str.size() - place);
-            std::ofstream outfile(save_path + files[i].substr(path.size(), files[i].size()-path.size()));
-            outfile<<str;
-            outfile.close();
-        }
-    }
-}
-
 //store data of contents
 void creator::store_file_data(creator::archive_tree *tree, creator::date_list *date, std::vector<std::string> &files, std::string path, std::string save_path)
 {
@@ -247,8 +203,10 @@ void creator::store_file_data(creator::archive_tree *tree, creator::date_list *d
 void creator::get_data_of_file(std::string file, std::string &data)
 { 
     std::ifstream contents(file);
-    if (contents.fail())
+    if (contents.fail()) {
         std::cerr << "Failed to open " << file << std::endl;
+        return;
+    }
 
     //get content's data
     if (getline(contents, data)) {
@@ -324,9 +282,8 @@ void creator::store_data_to_tree(creator::archive_tree *tree, creator::date_list
         } else if (get_word[0] == '!') {
         } else {
             while (true) {
-                if (now_tree->name.empty()) {
+                if (now_tree->name.empty())
                     now_tree->name = get_word;
-                }
                 
                 if (now_tree->name.compare(get_word) == 0) {
                     if (count_depth) {
@@ -462,25 +419,87 @@ bool creator::delete_null_tree(creator::archive_tree *tree)
         return false;    
 }
 
+void creator::create_contents(std::vector<std::string> &files, std::string path, std::string save_path) {
+    std::ifstream template_file("./archive_template/archive_contents_template.html");
+    if (template_file.fail()) {
+        std::cerr << "failed to open " << "./archive_template/archive_contents_template.html" << std::endl;
+        return;
+    }
+
+    std::istreambuf_iterator<char> template_it(template_file);
+    std::istreambuf_iterator<char> template_last;
+    std::string template_str(template_it, template_last);
+    template_file.close();
+    
+    for (int i = 0; i < files.size(); i++) {      
+        if (files[i].substr(files[i].size() - 5, 5) == ".html") {
+            std::ifstream contents_file(files[i]);
+            if (contents_file.fail())
+                std::cerr << "failed to open " << files[i] << std::endl;
+            
+            std::istreambuf_iterator<char> contents_it(contents_file);
+            std::istreambuf_iterator<char> contents_last;
+            std::string contents_str(contents_it, contents_last);
+            contents_file.close();
+            
+            bool index = false;
+            int place;
+            for (int i = 0; i < template_str.size() - 16; i++) {
+                if (template_str.substr(i, 16) == "archive_contents")
+                    index = true;
+                if ((index == true) && (template_str[i + 16] == '>')) {
+                    place = i + 17;
+                    break;
+                }
+            }
+            std::string str = template_str.substr(0, place) + "\n" + contents_str + template_str.substr(place, str.size() - place);
+            std::ofstream outfile(save_path + files[i].substr(path.size(), files[i].size()-path.size()));
+            outfile<<str;
+            outfile.close();
+        }
+    }
+}
+
 void creator::create_archive_text(creator::archive_tree *tree, std::vector<std::string> &files, std::string path)
 {
     //create index_text
     std::string index_texts;
     index_texts = create_index_text(tree);
-    //create hub_text    
-    std::vector<std::string> hub_texts;
-    hub_texts.clear();
-    create_hub_text(hub_texts);
-    /*
-    std::cout << index_texts << std::endl;
-    for (int i = 0; i < hub_texts.size(); i++) {
-        std::cout << hub_texts[i] << std::endl;
-    }
-    */
-    
     //create menu index
-    for (int i = 0; i < files.size(); i += 1)    
-        create_index(index_texts, files[i], path);
+    for (int i = 0; i < files.size(); i += 1) {
+       // create_index(index_texts, files[i], path);
+        if (files[i].substr(files[i].size() - 5, 5) == ".html") {
+            std::ifstream file(files[i]);
+            if (file.fail()) {
+                std::cerr << "failed to open " << files[i] << std::endl;
+                return;
+            }
+    
+            std::istreambuf_iterator<char> it(file);
+            std::istreambuf_iterator<char> last;
+            std::string str(it, last);
+            file.close();
+            bool index = false;
+            int place;
+            for (int i = 0; i < str.size() - 12; i++) {
+                if (str.substr(i, 12) == "archive_main")
+                    index = true;
+                if ((index == true) && (str[i + 12] == '>')) {
+                    place = i + 13;
+                    break;
+                }
+            }
+        
+            if (index) {
+                str = str.substr(0, place) + index_texts + str.substr(place, str.size() - place);
+                std::ofstream outfile("./build_page/" + files[i].substr(path.size(), files[i].size()-path.size()));
+                outfile<<str;
+                outfile.close();
+            }
+        }    
+    }
+    //create hub_text    
+    create_hub(tree);
 }
 
 std::string creator::create_index_text(creator::archive_tree *tree)
@@ -489,118 +508,133 @@ std::string creator::create_index_text(creator::archive_tree *tree)
     if (config.fail()) {
         std::cerr << "failed to open archive_index_text.config" << std::endl;
     }
+    
     std::istreambuf_iterator<char> it(config);
     std::istreambuf_iterator<char> last;
     std::string str(it, last);
-    std::vector<std::string> texts;
-    texts.clear();
+    std::vector<std::string> template_texts;
+    template_texts.clear();
 
     int start = 0;
     for (int i = 0; i < str.size(); i++) {
         if (str[i] == '$')
             start = i + 1;
         if (str[i] == '#')
-            texts.push_back(str.substr(start, i - start));
+            template_texts.push_back(str.substr(start, i - start));
     } 
     std::string result;
-    result += texts[0];
-    result += texts[1];
+    result += template_texts[0];
+    result += template_texts[1];
     archive_tree *now;
     now = tree;
     int num = 0;
     while (now != nullptr) {
-        result += texts[2] + "hub" + std::to_string(num++) + ".html" + texts[3] + now->name + texts[4];
+        result += template_texts[2] + "hub" + std::to_string(num++) + ".html" + template_texts[3] + now->name + template_texts[4];
         now = now->next;
     }
-    result += texts[5];
+    result += template_texts[5];
     return result;
 }
 
-void creator::create_hub_text(std::vector<std::string> &texts)
+void creator::create_hub(creator::archive_tree *tree)
 {
+    //get hub config
     std::ifstream config("./config/archive_hub_text.config");
-    if (config.fail()) {
+    if (config.fail())
         std::cerr << "failed to open archive_index_text.config" << std::endl;
-        return;
-    }
+
     std::istreambuf_iterator<char> it(config);
     std::istreambuf_iterator<char> last;
-    std::string str(it, last);
+    std::string str_hub(it, last);
+    std::vector<std::string> hub_texts;
+    hub_texts.clear();
 
     int start = 0;
-    for (int i = 0; i < str.size(); i++) {
-        if (str[i] == '$')
+    for (int i = 0; i < str_hub.size(); i++) {
+        if (str_hub[i] == '$')
             start = i + 1;
-        if (str[i] == '#')
-            texts.push_back(str.substr(start, i - start));
+        if (str_hub[i] == '#')
+            hub_texts.push_back(str_hub.substr(start, i - start));
     } 
     config.close();
-}
+    
+    //get hub template
+    std::ifstream template_file("./archive_template/archive_template.html");
+    if (template_file.fail()) {
+        std::cerr << "failed to open " << "./archive_template/archive_template.html" << std::endl;
+        return;
+    }
 
-void creator::create_index(std::string text, std::string search_file, std::string path)
-{
-
-    if (search_file.substr(search_file.size() - 5, 5) == ".html") {
-        std::ifstream file(search_file);
-        if (file.fail()) {
-            std::cerr << "failed to open " << search_file << std::endl;
+    std::istreambuf_iterator<char> template_it(template_file);
+    std::istreambuf_iterator<char> template_last;
+    std::string template_str(template_it, template_last);
+    template_file.close();
+            
+    bool index = false;
+    int place;
+    for (int i = 0; i < template_str.size() - 11; i++) {
+        if ((template_str.substr(i, 11) == "archive_hub") && (template_str[i+11] != '.'))
+            index = true;
+        if ((index == true) && (template_str[i + 11] == '>')) {
+            place = i + 12;
+            break;
         }
-        std::istreambuf_iterator<char> it(file);
-        std::istreambuf_iterator<char> last;
-        std::string str(it, last);
-        file.close();
-        bool index = false;
-        int place;
-        for (int i = 0; i < str.size() - 12; i++) {
-            if (str.substr(i, 12) == "archive_main")
-                index = true;
-            if ((index == true) && (str[i + 12] == '>')) {
-                place = i + 13;
-                break;
-            }
-        }
-        
-        if (index) {
-            str = str.substr(0, place) + text + str.substr(place, str.size() - place);
-            std::ofstream outfile("./build_page/" + search_file.substr(path.size(), search_file.size()-path.size()));
-            outfile<<str;
-            outfile.close();
-        }
+    }
+    
+    //create text and page
+    archive_tree *now;
+    now = tree;
+    int num = 0;
+    int hub_num = 0;
+    while (now != nullptr) {
+        //create index of hub
+        std::string text;
+        text += hub_texts[0];
+        text += now->name;
+        text += hub_texts[1];
+        text += hub_texts[2];
+        create_hub_index(now->deeper, hub_texts, text, &num);
+        text += hub_texts[8];
+        now = now->next; 
+        num++;
+        //create text of hub
+        std::string str = template_str.substr(0, place) + "\n" + text + template_str.substr(place, str.size() - place);
+        //save hub
+        std::ofstream outfile("./build_page/hub" + std::to_string(hub_num++) + ".html");
+        outfile<<str;
+        outfile.close();
     }
 }
 
-void creator::create_hub(creator::archive_tree *tree, std::vector<std::string> &texts, std::string search_file, std::string path)
+void creator::create_hub_index(creator::archive_tree *tree, std::vector<std::string> &template_texts, std::string &text, int *num)
 {
-std::cout << "start create hub" << std::endl;
-std::cout << search_file.substr(path.size(), search_file.size()-path.size()) << std::endl;
-
-
-
-
-
-
-
-
-
-
-
-
-
-}
-
-void creator::write_archive(creator::archive_tree *tree, int indent)
-{
-    std::string print;
-    for (int i = 0; i < indent; i++)
-        print = " " + print;
-   
-    std::cout << print + tree->name << std::endl;
-    if (tree->deeper != nullptr)
-        print_tree(tree->deeper, indent + 1);
-    if(tree->contents != nullptr)
-        print_contents(tree->contents, indent + 1);
-    if (tree->next != nullptr)
-        print_tree(tree->next, indent);
+    int my_num = *num;
+    text += template_texts[3];
+    text += std::to_string(my_num);
+    text += template_texts[4];
+    text += std::to_string(my_num);
+    text += template_texts[5];
+    text += tree->name;
+    text += template_texts[6];
+    
+    if (tree->contents != nullptr) {
+        text += template_texts[9];
+        text += tree->contents->url;
+        text += template_texts[10];
+        text += tree->contents->description;
+        text += template_texts[11];
+    }
+    if (tree->deeper != nullptr) {
+        text += template_texts[2];
+        (*num)++;
+        create_hub_index(tree->deeper, template_texts, text, num);
+        text += template_texts[8];
+    }
+    text += template_texts[7];
+    if (tree->next != nullptr) {
+        (*num)++;
+        create_hub_index(tree->next, template_texts, text, num);
+    }
 }
 
 //print tree for debug
