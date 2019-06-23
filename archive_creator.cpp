@@ -310,11 +310,11 @@ std::cout << "Start store data of " << file << std::endl;
                             now_tree = now_tree->deeper;
                         } else {
                             archive_tree *p = new creator::archive_tree;
-                            p->name = get_word;
                             now_tree->deeper = p;
                             now_tree = now_tree->deeper;
                         }
                         now_depth++;
+                        break;
                     }
                 } else if (now_tree->next != nullptr) {
                     now_tree = now_tree->next;
