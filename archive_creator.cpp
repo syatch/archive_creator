@@ -236,6 +236,7 @@ void creator::get_data_of_file(std::string file, std::string &data)
 
 void creator::store_data_to_tree(creator::archive_tree *tree, creator::date_list *date, std::string file, std::string &data, std::string save_path)
 {
+std::cout << "Start store data of " << file << std::endl;
     archive_tree *now_tree;
     now_tree = tree;
     archive_contents *now_contents;
@@ -247,6 +248,7 @@ void creator::store_data_to_tree(creator::archive_tree *tree, creator::date_list
     int depth = 0;
     int now_depth = 0;
     bool count_depth = true;
+    
     while (word_count <= size) {
         while (data[word_count] != ',' && word_count != size)
             word_count++;
@@ -293,7 +295,6 @@ void creator::store_data_to_tree(creator::archive_tree *tree, creator::date_list
                             p = p->deeper;
                             depth++;
                         }                    
-                        now_depth++;
                         count_depth = false;
                     } else if (depth == now_depth) {
                         if (now_tree->contents != nullptr) {
@@ -303,11 +304,18 @@ void creator::store_data_to_tree(creator::archive_tree *tree, creator::date_list
                             now_tree->contents = p;
                             now_contents = p;
                         }
+                        break;
                     } else {
+                        if (now_tree->deeper != nullptr) {
+                            now_tree = now_tree->deeper;
+                        } else {
+                            archive_tree *p = new creator::archive_tree;
+                            p->name = get_word;
+                            now_tree->deeper = p;
+                            now_tree = now_tree->deeper;
+                        }
                         now_depth++;
                     }
-                    now_tree = now_tree->deeper;
-                    break;
                 } else if (now_tree->next != nullptr) {
                     now_tree = now_tree->next;
                 } else {
@@ -319,6 +327,7 @@ void creator::store_data_to_tree(creator::archive_tree *tree, creator::date_list
             } 
         }    
     }
+std::cout << "End store data of " << file << std::endl;
 }
 
 void creator::store_content(creator::archive_contents *now_contents, std::string url, std::string date, std::string content_description)
