@@ -223,7 +223,7 @@ void creator::get_data_of_file(std::string file, std::string &data)
             j++;
             first_count++;
         }
-        while (data[j] != '-')
+        while ((data[j] != '-') || (data[j+1] != '-') || (data[j+2] != '>'))
             j++;
         end_count = data.size() - j;
         //mask data
@@ -626,13 +626,9 @@ void creator::create_hub_index(creator::archive_tree *tree, std::vector<std::str
     text += tree->name;
     text += template_texts[6];
     
-    if (tree->contents != nullptr) {
-        text += template_texts[9];
-        text += tree->contents->url;
-        text += template_texts[10];
-        text += tree->contents->description;
-        text += template_texts[11];
-    }
+    if (tree->contents != nullptr)
+        create_hub_contents(tree->contents, template_texts, text);
+
     if (tree->deeper != nullptr) {
         text += template_texts[2];
         (*num)++;
@@ -644,6 +640,18 @@ void creator::create_hub_index(creator::archive_tree *tree, std::vector<std::str
         (*num)++;
         create_hub_index(tree->next, template_texts, text, num);
     }
+}
+
+void creator::create_hub_contents(creator::archive_contents *contents, std::vector<std::string> &template_texts, std::string &text)
+{
+    text += template_texts[9];
+    text += contents->url;
+    text += template_texts[10];
+    text += contents->description;
+    text += template_texts[11];
+    
+    if (contents->next != nullptr) 
+        create_hub_contents(contents->next, template_texts, text);
 }
 
 //print tree for debug

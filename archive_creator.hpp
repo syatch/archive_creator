@@ -76,6 +76,8 @@ namespace archive_creator {
             void create_hub(archive_tree *);
             //create hub index text
             void create_hub_index(archive_tree *, std::vector<std::string> &, std::string &, int *);
+            //create hub index contents
+            void create_hub_contents(archive_contents *, std::vector<std::string> &, std::string &);
             //print data
             void print_tree(creator::config_tree *, int);
             void print_tree(creator::archive_tree *, int);

@@ -10,6 +10,7 @@ build/build_page/*.ico
 build/build_page/fonts
 build/build_page/pictures
 build/build_page/contents/*
+build/build_page/documents/*
 build/archive_creator
 build/cmake_install.cmake
 
