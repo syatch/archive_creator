@@ -1,9 +1,9 @@
 #archive_main {
-	position: absolute;
+	position: relative;
 	top: 51%;
-	left: 30%;
 	height: auto;
-	width: 40%;
+	width: 430px;
+    margin: 0px auto;
 	background-color:rgba(0,0,0,0);
 	border: 0vw;
     padding: 0vw;
@@ -12,11 +12,11 @@
 }
 
 #archive_hub {
-	position: absolute;
+	position: relative;
 	top: 51%;
-	left: 30%;
 	height: auto;
-	width: 40%;
+	width: 430px;
+    margin: 0px auto;
 	background-color:rgba(0,0,0,0);
 	border: 0vw;
     padding: 0vw;
@@ -80,15 +80,14 @@
 }
 
 #archive_contents {
-	position: absolute;
+	position: relative;
 	top: 51%;
-	left: 10%;
 	height: auto;
-	width: 80%;
+	width: 1000px;
+    margin: 0px auto;
 	background-color:rgba(0,0,0,0.7);
-	border: 0vw;
-    padding: 0vw;
-    margin: auto;
+	border: 0px;
+    padding: 0px;
     text-align:center;	
 }
 /*
