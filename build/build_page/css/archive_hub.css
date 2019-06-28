@@ -3,6 +3,16 @@
 	src: url('../fonts/ipaexm.ttf');	
 }
 
+.archive_menu {
+	height: auto;
+	width: 100%;
+	background-color:rgba(0,0,0,0.25);
+    border: 0vw;
+    padding: 0vw;
+    margin: auto;
+    text-align:left;	
+}
+
 /*動作*/
 .archive_tab {
     transition: transform 0.3s;

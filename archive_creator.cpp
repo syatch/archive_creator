@@ -595,6 +595,7 @@ void creator::create_hub(creator::archive_tree *tree)
     now = tree;
     int num = 0;
     int hub_num = 0;
+    int index_num = 1;
     while (now != nullptr) {
         //create index of hub
         std::string text;
@@ -602,7 +603,7 @@ void creator::create_hub(creator::archive_tree *tree)
         text += now->name;
         text += hub_texts[1];
         text += hub_texts[2];
-        create_hub_index(now->deeper, hub_texts, text, &num);
+        create_hub_index(now->deeper, hub_texts, text, &num, index_num);
         text += hub_texts[8];
         now = now->next; 
         num++;
@@ -615,7 +616,7 @@ void creator::create_hub(creator::archive_tree *tree)
     }
 }
 
-void creator::create_hub_index(creator::archive_tree *tree, std::vector<std::string> &template_texts, std::string &text, int *num)
+void creator::create_hub_index(creator::archive_tree *tree, std::vector<std::string> &template_texts, std::string &text, int *num, int index)
 {
     int my_num = *num;
     text += template_texts[3];
@@ -623,35 +624,39 @@ void creator::create_hub_index(creator::archive_tree *tree, std::vector<std::str
     text += template_texts[4];
     text += std::to_string(my_num);
     text += template_texts[5];
+    for (int i = 0; i < index; i++)
+        text += "　";
     text += tree->name;
     text += template_texts[6];
     
     if (tree->contents != nullptr)
-        create_hub_contents(tree->contents, template_texts, text);
+        create_hub_contents(tree->contents, template_texts, text, index + 1);
 
     if (tree->deeper != nullptr) {
         text += template_texts[2];
         (*num)++;
-        create_hub_index(tree->deeper, template_texts, text, num);
+        create_hub_index(tree->deeper, template_texts, text, num, index + 1);
         text += template_texts[8];
     }
     text += template_texts[7];
     if (tree->next != nullptr) {
         (*num)++;
-        create_hub_index(tree->next, template_texts, text, num);
+        create_hub_index(tree->next, template_texts, text, num, index);
     }
 }
 
-void creator::create_hub_contents(creator::archive_contents *contents, std::vector<std::string> &template_texts, std::string &text)
+void creator::create_hub_contents(creator::archive_contents *contents, std::vector<std::string> &template_texts, std::string &text, int index)
 {
     text += template_texts[9];
     text += contents->url;
     text += template_texts[10];
+    for (int i = 0; i < index; i++)
+        text += "　";
     text += contents->description;
     text += template_texts[11];
     
     if (contents->next != nullptr) 
-        create_hub_contents(contents->next, template_texts, text);
+        create_hub_contents(contents->next, template_texts, text, index);
 }
 
 //print tree for debug

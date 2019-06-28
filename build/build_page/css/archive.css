@@ -15,7 +15,7 @@
 	position: relative;
 	top: 51%;
 	height: auto;
-	width: 430px;
+	width: 550px;
     margin: 0px auto;
 	background-color:rgba(0,0,0,0);
 	border: 0vw;
@@ -23,20 +23,7 @@
     margin: auto;
     text-align:center;	
 }
-/*
-#archive_doc_hub {
-	position: absolute;
-	top: 51%;
-	left: 30%;
-	height: auto;
-	width: 40%;
-	background-color:rgba(0,0,0,0);
-	border: 0vw;
-    padding: 0vw;
-    margin: auto;
-    text-align:center;	
-}
-*/
+
 #archive_title {
 	width: 100%;
 	background-color:rgba(0,0,0,0.5);
@@ -45,20 +32,7 @@
     margin: auto;
     text-align:center;	
 }
-/*
-#archive_documents {
-	position: absolute;
-	top: 51%;
-	left: 30%;
-	height: auto;
-	width: 40%;
-	background-color:rgba(0,0,0,0);
-	border: 0vw;
-    padding: 0vw;
-    margin: auto;
-    text-align:center;	
-}
-*/
+
 #archive_menu {
 	height: auto;
 	width: 100%;
@@ -90,17 +64,3 @@
     padding: 0px;
     text-align:center;	
 }
-/*
-#archive_documents_contents {
-	position: absolute;
-	top: 51%;
-	left: 10%;
-	height: auto;
-	width: 80%;
-	background-color:rgba(0,0,0,0.5);
-	border: 0vw;
-    padding: 0vw;
-    margin: auto;
-    text-align:center;	
-}
-*/

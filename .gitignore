@@ -9,6 +9,7 @@ build/build_page/*.html
 build/build_page/*.ico
 build/build_page/fonts
 build/build_page/pictures
+build/build_page/files/*
 build/build_page/contents/*
 build/build_page/documents/*
 build/archive_creator
