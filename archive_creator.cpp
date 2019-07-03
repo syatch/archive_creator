@@ -2,12 +2,6 @@
 
 using namespace archive_creator;
 
-int main (void)
-{
-    creator archive;
-    archive.create_archive();
-}
-
 void creator::create_archive()
 {
     config_tree *config_tree = new creator::config_tree;
@@ -624,7 +618,7 @@ void creator::create_hub_index(creator::archive_tree *tree, std::vector<std::str
     text += template_texts[4];
     text += std::to_string(my_num);
     text += template_texts[5];
-    for (int i = 0; i < index; i++)
+    for (int i = 0; i <= index; i++)
         text += "　";
     text += tree->name;
     text += template_texts[6];
@@ -650,7 +644,7 @@ void creator::create_hub_contents(creator::archive_contents *contents, std::vect
     text += template_texts[9];
     text += contents->url;
     text += template_texts[10];
-    for (int i = 0; i < index; i++)
+    for (int i = 0; i <= index; i++)
         text += "　";
     text += contents->description;
     text += template_texts[11];

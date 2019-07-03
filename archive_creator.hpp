@@ -1,3 +1,6 @@
+#ifndef ARCHIVE_CREATOR
+#define ARCHIVE_CREATOR
+
 #include <stdio.h>
 //cout
 #include <iostream>
@@ -9,8 +12,6 @@
 #include <bits/stdc++.h>
 #include <sys/stat.h>
 #include <dirent.h>
-//vextor
-//#include <vector.h>
 
 namespace archive_creator {
     class creator {
@@ -90,3 +91,5 @@ namespace archive_creator {
             void delete_list(creator::date_list **);
         };
 }
+
+#endif

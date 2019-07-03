@@ -10,6 +10,6 @@ project(archive_creator CXX)
 #add library
 #target_link_libraries()
 
-#create archive_creator.o from archive_creator.cpp and archive_creator.hpp
-add_executable(archive_creator archive_creator.cpp archive_creator.hpp)
+#create archive_creator from main.cpp archive_creator.cpp and archive_creator.hpp
+add_executable(archive_creator main.cpp archive_creator.cpp archive_creator.hpp)
 
