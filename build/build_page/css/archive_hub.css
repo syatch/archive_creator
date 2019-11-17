@@ -19,7 +19,7 @@
 }
 
 .archive_tab:hover {
-    padding : 6px 0px;
+    /*padding : 6px 0px;*/
 }
 
 div.archive_base {
@@ -28,12 +28,14 @@ div.archive_base {
 
 div.archive_base:hover {
     color : orange;
+    /*
     padding : 6px 0px;
     transform: scale(1.15,1.15);
     -webkit-transform: scale(1.15,1.15);
     -moz-transform: scale(1.15,1.15);
     -o-transform: scale(1.15,1.15);
     -ms-transform: scale(1.15,1.15);
+    */
 }
   
 a.archive_base {

@@ -10,12 +10,14 @@
 
 .archive_link:hover {
     transition: transform 0.3s;
+    /*
     padding : 6px 0px;
     transform: scale(1.15,1.15);
     -webkit-transform: scale(1.15,1.15);
     -moz-transform: scale(1.15,1.15);
     -o-transform: scale(1.15,1.15);
-    -ms-transform: scale(1.15,1.15);    
+    -ms-transform: scale(1.15,1.15); 
+    */   
 }
 
 a.archive_base {
