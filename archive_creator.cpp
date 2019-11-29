@@ -33,21 +33,20 @@ void creator::create_archive()
     get_files(file_names, page_path);
     //create_archive_
     create_archive_text(archive_tree, file_names, page_path);
-    /*
+
     //print_tree(config_tree, 0);
     if (config_tree != nullptr) {
-        print_tree(config_tree, 0);
+        //print_tree(config_tree, 0);
         delete_tree(&config_tree);
     }
     if (archive_tree != nullptr) {
-        print_tree(archive_tree, 0);
+        //print_tree(archive_tree, 0);
         delete_tree(&archive_tree);
     }
     if (date_list != nullptr) {
-        print_list(date_list);
+        //print_list(date_list);
         delete_list(&date_list);
     }
-    */
 }
 
 //read archive.config
@@ -70,7 +69,7 @@ void creator::read_config(config_tree* tree)
         int size = str.size();
         int first_count = 0;
         int word_count = 0;
-        
+
         //erase space
         for (int k = 0; k < size + 1; k++) {
             if (str[k] == ' ')
@@ -195,7 +194,7 @@ void creator::store_file_data(creator::archive_tree *tree, creator::date_list *d
 
 //get data of file
 void creator::get_data_of_file(std::string file, std::string &data)
-{ 
+{
     std::ifstream contents(file);
     if (contents.fail()) {
         std::cerr << "Failed to open " << file << std::endl;
@@ -224,13 +223,13 @@ void creator::get_data_of_file(std::string file, std::string &data)
         data = data.substr(first_count, data.size() - (first_count + end_count));
     } else {
         std::cout << "ERROR couldn't get strings" << std::endl << std::endl;
-    }     
+    }
     contents.close();
 }
 
 void creator::store_data_to_tree(creator::archive_tree *tree, creator::date_list *date, std::string file, std::string &data, std::string save_path)
 {
-std::cout << "Start store data of " << file << std::endl;
+    std::cout << "Start store data of " << file << std::endl;
     archive_tree *now_tree;
     now_tree = tree;
     archive_contents *now_contents;
@@ -242,14 +241,14 @@ std::cout << "Start store data of " << file << std::endl;
     int depth = 0;
     int now_depth = 0;
     bool count_depth = true;
-    
+
     while (word_count <= size) {
         while (data[word_count] != ',' && word_count != size)
             word_count++;
         get_word = data.substr(first_count ,word_count - first_count);
         word_count++;
         first_count = word_count;
-            
+
         if (get_word[0] == '&') {
             get_word =  get_word.substr(1, get_word.size() - 1);
             content_description = get_word;
@@ -262,11 +261,11 @@ std::cout << "Start store data of " << file << std::endl;
             while (date_count <= get_word.size()) {
                 while (get_word[date_count] != '/' && date_count != get_word.size())
                     date_count++;
-                
+
                 part_date = get_word.substr(date_first, date_count - date_first);
                 if (part_date.size() == 1)
                     part_date = '0' + part_date;
-                
+
                 get_date = get_date + part_date;
                 date_first = date_count;
                 date_count++;
@@ -280,7 +279,7 @@ std::cout << "Start store data of " << file << std::endl;
             while (true) {
                 if (now_tree->name.empty())
                     now_tree->name = get_word;
-                
+
                 if (now_tree->name.compare(get_word) == 0) {
                     if (count_depth) {
                         archive_tree *p;
@@ -288,7 +287,7 @@ std::cout << "Start store data of " << file << std::endl;
                         while (p->deeper != nullptr) {
                             p = p->deeper;
                             depth++;
-                        }                    
+                        }
                         count_depth = false;
                     } else if (depth == now_depth) {
                         if (now_tree->contents != nullptr) {
@@ -318,10 +317,10 @@ std::cout << "Start store data of " << file << std::endl;
                     now_tree->next = p;
                     now_tree = now_tree->next;
                 }
-            } 
-        }    
+            }
+        }
     }
-std::cout << "End store data of " << file << std::endl;
+    std::cout << "End store data of " << file << std::endl;
 }
 
 void creator::store_content(creator::archive_contents *now_contents, std::string url, std::string date, std::string content_description)
@@ -356,17 +355,17 @@ void creator::store_date(creator::date_list *now_date, std::string url, std::str
             p->description = now_date->description;
             p->date = now_date->date;
             p->date_num = now_date->date_num;
-            
+
             now_date->url = url;
             now_date->description = content_description;
             now_date->date = date;
             now_date->date_num = content_date;
-            
+
             p->next = now_date->next;
             now_date->next = p;
             break;
         }
-                
+
         if (now_date -> next != nullptr) {
             now_date = now_date->next;
         } else {
@@ -387,7 +386,7 @@ bool creator::delete_null_tree(creator::archive_tree *tree)
     //if next is empty, delete next
     if (tree->next != nullptr) {
         empty = delete_null_tree(tree->next);
-        if (empty) {         
+        if (empty) {
             if (tree->next->next != nullptr) {
                 archive_tree **p;
                 p = &(tree->next->next);
@@ -412,14 +411,14 @@ bool creator::delete_null_tree(creator::archive_tree *tree)
             } else {
                 delete tree->deeper;
                 tree->deeper = nullptr;
-            }  
+            }
         }
     }
     //return if this tree is not used to store data
     if ((tree->deeper == nullptr) && (tree->contents == nullptr))
         return true;
     else
-        return false;    
+        return false;
 }
 
 void creator::create_contents(std::vector<std::string> &files, std::string path, std::string save_path) {
@@ -433,18 +432,18 @@ void creator::create_contents(std::vector<std::string> &files, std::string path,
     std::istreambuf_iterator<char> template_last;
     std::string template_str(template_it, template_last);
     template_file.close();
-    
-    for (int i = 0; i < files.size(); i++) {      
+
+    for (int i = 0; i < files.size(); i++) {
         if (files[i].substr(files[i].size() - 5, 5) == ".html") {
             std::ifstream contents_file(files[i]);
             if (contents_file.fail())
                 std::cerr << "failed to open " << files[i] << std::endl;
-            
+
             std::istreambuf_iterator<char> contents_it(contents_file);
             std::istreambuf_iterator<char> contents_last;
             std::string contents_str(contents_it, contents_last);
             contents_file.close();
-            
+
             bool index = false;
             int place;
             for (int i = 0; i < template_str.size() - 16; i++) {
@@ -456,11 +455,50 @@ void creator::create_contents(std::vector<std::string> &files, std::string path,
                 }
             }
             std::string str = template_str.substr(0, place) + "\n" + contents_str + template_str.substr(place, str.size() - place);
+            str = complement_source_text(str);
             std::ofstream outfile(save_path + files[i].substr(path.size(), files[i].size()-path.size()));
-            outfile<<str;
+            outfile << str;
             outfile.close();
         }
     }
+}
+
+std::string creator::complement_source_text(std::string str)
+{
+    int i = 0;
+    bool in_source = false;
+    while (true) {
+        if (!in_source) { // search div class = "source"
+            if ((i + 6) > str.size()) {
+                break;
+            }
+            if (str.substr(i, 8) == "\"source\"") {
+                in_source = true;
+                i += 8;
+                while ((str[i] != CR) && (str[i] != LF))
+                    i++;
+                i++;
+            }
+        } else { // in source
+            if ((str[i] == CR) || (str[i] == LF)){
+                if ((str.substr(i - 4, 4) != "<br>") && (str.substr(i - 4, 4) != "<BR>")) {
+                    str.insert(i,"<br>");
+                    i += 4;
+                }
+                i++;
+            }
+            if ((i + 6) > str.size()) {
+                break;
+            } else if (str.substr(i, 6) == "</div>") {
+                in_source = false;
+                i += 6;
+            }
+        }
+        i++;
+        if (i > str.size())
+            break;
+    }
+    return str;
 }
 
 void creator::create_archive_text(creator::archive_tree *tree, std::vector<std::string> &files, std::string path)
@@ -477,7 +515,7 @@ void creator::create_archive_text(creator::archive_tree *tree, std::vector<std::
                 std::cerr << "failed to open " << files[i] << std::endl;
                 return;
             }
-    
+
             std::istreambuf_iterator<char> it(file);
             std::istreambuf_iterator<char> last;
             std::string str(it, last);
@@ -492,16 +530,16 @@ void creator::create_archive_text(creator::archive_tree *tree, std::vector<std::
                     break;
                 }
             }
-        
+
             if (index) {
                 str = str.substr(0, place) + index_texts + str.substr(place, str.size() - place);
                 std::ofstream outfile("./build_page/" + files[i].substr(path.size(), files[i].size()-path.size()));
-                outfile<<str;
+                outfile << str;
                 outfile.close();
             }
-        }    
+        }
     }
-    //create hub_text    
+    //create hub_text
     create_hub(tree);
 }
 
@@ -511,7 +549,7 @@ std::string creator::create_index_text(creator::archive_tree *tree)
     if (config.fail()) {
         std::cerr << "failed to open archive_index_text.config" << std::endl;
     }
-    
+
     std::istreambuf_iterator<char> it(config);
     std::istreambuf_iterator<char> last;
     std::string str(it, last);
@@ -524,7 +562,7 @@ std::string creator::create_index_text(creator::archive_tree *tree)
             start = i + 1;
         if (str[i] == '#')
             template_texts.push_back(str.substr(start, i - start));
-    } 
+    }
     std::string result;
     result += template_texts[0];
     result += template_texts[1];
@@ -558,9 +596,9 @@ void creator::create_hub(creator::archive_tree *tree)
             start = i + 1;
         if (str_hub[i] == '#')
             hub_texts.push_back(str_hub.substr(start, i - start));
-    } 
+    }
     config.close();
-    
+
     //get hub template
     std::ifstream template_file("./archive_template/archive_template.html");
     if (template_file.fail()) {
@@ -572,7 +610,7 @@ void creator::create_hub(creator::archive_tree *tree)
     std::istreambuf_iterator<char> template_last;
     std::string template_str(template_it, template_last);
     template_file.close();
-            
+
     bool index = false;
     int place;
     for (int i = 0; i < template_str.size() - 11; i++) {
@@ -583,7 +621,7 @@ void creator::create_hub(creator::archive_tree *tree)
             break;
         }
     }
-    
+
     //create text and page
     archive_tree *now;
     now = tree;
@@ -599,7 +637,7 @@ void creator::create_hub(creator::archive_tree *tree)
         text += hub_texts[2];
         create_hub_index(now->deeper, hub_texts, text, &num, index_num);
         text += hub_texts[8];
-        now = now->next; 
+        now = now->next;
         num++;
         //create text of hub
         std::string str = template_str.substr(0, place) + "\n" + text + template_str.substr(place, str.size() - place);
@@ -622,7 +660,7 @@ void creator::create_hub_index(creator::archive_tree *tree, std::vector<std::str
         text += "　";
     text += tree->name;
     text += template_texts[6];
-    
+
     if (tree->contents != nullptr)
         create_hub_contents(tree->contents, template_texts, text, index + 1);
 
@@ -648,8 +686,8 @@ void creator::create_hub_contents(creator::archive_contents *contents, std::vect
         text += "　";
     text += contents->description;
     text += template_texts[11];
-    
-    if (contents->next != nullptr) 
+
+    if (contents->next != nullptr)
         create_hub_contents(contents->next, template_texts, text, index);
 }
 
@@ -659,7 +697,7 @@ void creator::print_tree(creator::config_tree *tree, int indent)
     std::string print;
     for (int i = 0; i < indent; i++)
         print = " " + print;
-    
+
     std::cout << print + tree->name << std::endl;
     if (tree->deeper != nullptr)
         print_tree(tree->deeper, indent + 1);
@@ -672,7 +710,7 @@ void creator::print_tree(creator::archive_tree *tree, int indent)
     std::string print;
     for (int i = 0; i < indent; i++)
         print = " " + print;
-   
+
     std::cout << print + tree->name << std::endl;
     if (tree->deeper != nullptr)
         print_tree(tree->deeper, indent + 1);
@@ -697,7 +735,7 @@ void creator::print_contents(creator::archive_contents *content, int indent)
     std::string print;
     for (int i = 0; i < indent; i++)
         print = " " + print;
-    
+
     std::cout << print + ":" + content->description << std::endl;
     if (content->next != nullptr)
         print_contents(content->next, indent);

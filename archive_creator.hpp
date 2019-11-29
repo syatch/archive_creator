@@ -17,28 +17,31 @@ namespace archive_creator {
     class creator {
         public :
             void create_archive();
-            
+
         private :
+            const char CR = '\r';
+            const char LF = '\n';
+
             struct config_tree {
                 std::string name;
                 config_tree *next= nullptr;
                 config_tree *deeper= nullptr;
             };
-            
+
             struct archive_contents {
                 std::string url;
                 std::string description;
                 std::string date;
                 archive_contents *next = nullptr;
             };
-            
+
             struct archive_tree {
                 std::string name;
                 archive_contents *contents = nullptr;
                 archive_tree *next = nullptr;
                 archive_tree *deeper = nullptr;
             };
-            
+
             struct date_list {
                 std::string url;
                 std::string description;
@@ -69,6 +72,8 @@ namespace archive_creator {
             bool delete_null_tree(creator::archive_tree *);
             //create content files
             void create_contents(std::vector<std::string> &, std::string, std::string);
+            /// complement source tesxt
+            std::string complement_source_text (std::string);
             //create_archive_hub
             void create_archive_text(archive_tree *, std::vector<std::string> &, std::string);
             //create archive index text
