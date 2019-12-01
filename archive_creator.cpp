@@ -475,7 +475,9 @@ std::string creator::complement_source_text(std::string str)
             if (str.substr(i, 8) == "\"source\"") {
                 in_source = true;
                 i += 8;
-                while ((str[i] != CR) && (str[i] != LF))
+                while (str[i] != CR)
+                    i++;
+                while (str[i] != LF)
                     i++;
                 i++;
             }
